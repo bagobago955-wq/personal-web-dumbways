@@ -98,10 +98,6 @@ function requireAuth(req, res, next) {
 // ==========================================
 // AUTHENTICATION ROUTES (Single Admin Only)
 // ==========================================
-const ADMIN_EMAIL = 'personalweb@gmail.com';
-const ADMIN_PASSWORD = 'Jakarta123';
-const ADMIN_NAME = 'Nouval';
-
 // Disable registration
 app.get('/register', (req, res) => {
     req.flash('error', 'Registrasi tidak tersedia. Hanya admin yang dapat login.');
@@ -117,31 +113,33 @@ app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Only allow the single admin account
-        if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+        // Cek apakah email ada di database
+        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        
+        if (result.rows.length === 0) {
             req.flash('error', 'Email atau password salah!');
             return res.redirect('/login');
         }
 
-        // Check if admin exists in DB, if not create it
-        let result = await pool.query('SELECT * FROM users WHERE email = $1', [ADMIN_EMAIL]);
-        let adminUser;
+        const user = result.rows[0];
 
-        if (result.rows.length === 0) {
-            const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
-            const insertResult = await pool.query(
-                'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *',
-                [ADMIN_NAME, ADMIN_EMAIL, hashedPassword]
-            );
-            adminUser = insertResult.rows[0];
-        } else {
-            adminUser = result.rows[0];
+        // Verifikasi password dengan bcrypt
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        
+        if (!isValidPassword) {
+            req.flash('error', 'Email atau password salah!');
+            return res.redirect('/login');
         }
 
-        req.session.user = { id: adminUser.id, name: adminUser.name, email: adminUser.email };
-        req.flash('success', `Selamat datang, ${adminUser.name}!`);
+        // Login berhasil
+        req.session.user = { id: user.id, name: user.name, email: user.email };
+        req.flash('success', `Selamat datang, ${user.name}!`);
         res.redirect('/');
-    } catch (error) { console.error(error); req.flash('error', 'Error server saat login.'); res.redirect('/login'); }
+    } catch (error) { 
+        console.error(error); 
+        req.flash('error', 'Error server saat login.'); 
+        res.redirect('/login'); 
+    }
 });
 
 app.get('/logout', (req, res) => {
