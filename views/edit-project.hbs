@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light py-3 navbar-glass">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand fw-bold fs-3 text-dark" href="/">NOUVAL</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item mx-2"><a class="nav-link text-dark" href="/">Home</a></li>
+                    <li class="nav-item mx-2"><a class="nav-link text-dark" href="/my-project">My Projects</a></li>
+                    <li class="nav-item mx-2"><a class="nav-link text-dark" href="/contact">Contact</a></li>
+                </ul>
+                <div class="d-flex gap-2 align-items-center">
+                    <button class="theme-toggle me-2" id="themeToggle" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <a href="/my-project" class="btn btn-outline-dark rounded-pill px-4 btn-sm">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card border-0 rounded-4 p-5 shadow-sm bg-white">
+                    <h2 class="text-center fw-bold mb-4">Edit Project</h2>
+                    
+                    <form action="/edit-project/{{project.id}}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Project Name</label>
+                            <input type="text" class="form-control custom-input" name="projectName" value="{{project.name}}" required>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Start Date</label>
+                                <input type="date" class="form-control custom-input" name="startDate" value="{{project.start_date_formatted}}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">End Date</label>
+                                <input type="date" class="form-control custom-input" name="endDate" value="{{project.end_date_formatted}}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea class="form-control custom-input" name="description" rows="4" required>{{project.description}}</textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Repository URL <span class="text-secondary fw-normal">(Optional)</span></label>
+                                <input type="url" class="form-control custom-input" name="repository" value="{{project.repository}}" placeholder="https://github.com/username/repo">
+                            </div>
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <label class="form-label fw-semibold">Live Demo URL <span class="text-secondary fw-normal">(Optional)</span></label>
+                                <input type="url" class="form-control custom-input" name="live_demo" value="{{project.live_demo}}" placeholder="https://your-project.vercel.app">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Technologies</label>
+                            <div class="row">
+                                {{#each project.technologies}}
+                                    <div class="col-6 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="technologies" value="{{this}}" id="tech{{@index}}" checked>
+                                            <label class="form-check-label text-secondary" for="tech{{@index}}">{{this}}</label>
+                                        </div>
+                                    </div>
+                                {{/each}}
+                                {{#unless project.technologies}}
+                                    <div class="col-6 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="technologies" value="Node Js" id="nodeJs">
+                                            <label class="form-check-label text-secondary" for="nodeJs">Node Js</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="technologies" value="Next Js" id="nextJs">
+                                            <label class="form-check-label text-secondary" for="nextJs">Next Js</label>
+                                        </div>
+                                    </div>
+                                {{/unless}}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="uploadImage" class="form-label fw-semibold">Update Image (Optional)</label>
+                            <div class="input-group custom-input overflow-hidden p-0">
+                                <input type="file" class="form-control border-0" id="uploadImage" name="uploadImage" accept="image/*">
+                            </div>
+                            <div class="form-text mt-2">Leave empty to keep the current image.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between gap-2 mt-4">
+                            <a href="/my-project" class="btn btn-outline-dark rounded-pill px-5">Cancel</a>
+                            <button type="submit" class="btn btn-dark rounded-pill px-5 fw-bold">Update Project</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/theme.js"></script>
+</body>
+</html>
