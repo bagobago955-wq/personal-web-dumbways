@@ -252,6 +252,14 @@ a { text-decoration: none; }
     justify-content: center;
     padding: 14px;
     box-shadow: var(--shadow-glow);
+    animation: waveFloat 6s ease-in-out infinite;
+}
+
+@keyframes waveFloat {
+    0% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-15px) rotate(3deg); }
+    66% { transform: translateY(10px) rotate(-2deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
 }
 
 .profile-image {
